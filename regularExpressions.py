@@ -30,3 +30,5 @@ a = re.findall(r"\d\d\.\d{2}\.[0-9][0-9]\.[0-9]{1,3}",
 b = re.sub(r"\d", "7",
            arp)  # replaces all occurrences of the specified pattern in the target string with a string you enter as an argument
 '77.77.77.7      7         b7:a7:7a:ff:c7:77 VLAN#777             L   77.77.77.77'  # result of the above operation
+
+

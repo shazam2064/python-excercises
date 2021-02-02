@@ -11,3 +11,4 @@ from math import sin
 
 # Importing all the names (variables and functions) from the math module
 from math import *
+
