@@ -10,3 +10,10 @@ x = "He is ... z . . . sleeeeeeping"
 
 re.search(r"z{10}", x)
 
+re.search(r"z{1,}", x)
+
+re.search(r"z{1,10}", x)
+
+re.search(r"z{1,10}?", x)
+
+re.search(r"z{3,10}?", x)
