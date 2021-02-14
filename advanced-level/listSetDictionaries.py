@@ -8,7 +8,7 @@ for i in range(10):
 # ...we can use a list comprehension
 list2 = [x ** 2 for x in range(10)]
 
-list3 = [x ** 2 for x in range(10) if x > 5]  # with a conditional statament
+list3 = [x ** 2 for x in range(10) if x > 5]  # with a conditional statement
 
 set1 = {x ** 2 for x in range(10)}  # set comprehension
 
