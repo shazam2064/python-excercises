@@ -1,24 +1,35 @@
-"""django_blog URL Configuration
+from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseNotFound
+from django.views import View
+from datetime import datetime
+from django.shortcuts import render, redirect
+from blog.models import ArticleModel
+from django.utils import timezone
+from blog.forms import ArticleForm
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
+# Create your views here.
+class Home(View):
+    def get(self, request):
+        return HttpResponse("Welcome to my blog!")
+    def post(self, request):
+        return HttpResponse("[POST] Welcome to my blog!")
 
-from django.urls import include, path
-from .views import Home, Article, ArticleDetails
+class Article(View):
+    def get(self, request):
+        articles = ArticleModel.objects.all()
 
-urlpatterns = [
-    path('', Home.as_view()),
-    path("articles", Article.as_view()),
-    path('articles/<int:id>', ArticleDetails.as_view)
-]
+        return render(request, "articles.html", {"articles": articles, "form": ArticleForm()})
+
+    def post(self, request):
+        form = ArticleForm(request.POST)
+        form.instance.created_at = datetime.now(tz=timezone.utc)
+        form.save()
+        return redirect("/blog/articles")
+
+class ArticleDetails(View):
+    def get(selfself, request, id):
+        try:
+            article = ArticleModel.objects.get(id=id)
+            return render(request, "article_details.html", {"article": article})
+        except ArticleModel.DoesNotExist:
+            return HttpResponseNotFound()
