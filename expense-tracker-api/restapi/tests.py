@@ -1,8 +1,10 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from restapi import models
 
+from rest_framework_api_key.models import APIKey
+from rest_framework.test import APIClient
+
+from restapi import models
 
 # Create your tests here.
 
@@ -24,8 +26,9 @@ class TestModels(TestCase):
 
 class TestViews(TestCase):
     def setUp(self):
-        User.objects.create_user("test1234", "testuser@example.com", "test1234")
-        self.client.login(username="test1234", password="test1234")
+        api_key, key = APIKey.objects.create_key(name="expense-service")
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION=f"Api-Key {key}")
 
     def test_expense_create(self):
         payload = {
@@ -96,17 +99,29 @@ class TestViews(TestCase):
         ebay_expense = models.Expense.objects.create(
             amount=200, merchant="ebay", description="watch", category="fashion"
         )
-
         url = "/api/expenses?merchant=amazon"
         res = self.client.get(url, format="json")
-
         self.assertEqual(200, res.status_code)
-
         json_res = res.json()
-
         self.assertEqual(1, len(json_res))
         self.assertEqual(amazon_expense.id, json_res[0]["id"])
         self.assertEqual(amazon_expense.amount, json_res[0]["amount"])
         self.assertEqual(amazon_expense.merchant, json_res[0]["merchant"])
         self.assertEqual(amazon_expense.description, json_res[0]["description"])
         self.assertEqual(amazon_expense.category, json_res[0]["category"])
+
+    def test_list_expense_filter_by_category(self):
+        amazon_expense = models.Expense.objects.create(
+            amount=100, merchant="amazon", description="sunglasses", category="fashion"
+        )
+        ebay_expense = models.Expense.objects.create(
+            amount=200, merchant="ebay", description="watch", category="fashion"
+        )
+        groceries_expense = models.Expense.objects.create(
+            amount=30, merchant="walmart", description="beer", category="groceries"
+        )
+        url = "/api/expenses?category=fashion"
+        res = self.client.get(url, format="json")
+        self.assertEqual(200, res.status_code)
+        json_res = res.json()
+        self.assertEqual(2, len(json_res))
